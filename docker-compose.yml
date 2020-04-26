@@ -15,7 +15,6 @@ services:
     ports:
       - 80:80
       - 8080:8080
-      - 8443:8443
     depends_on:
       - biz
     environment:
@@ -52,6 +51,8 @@ services:
     command: "-c /configs/biz.toml"
     volumes:
       - "./docker/biz.toml:/configs/biz.toml"
+    ports:
+      - 8443:8443
     depends_on:
       - nats
       - etcd
