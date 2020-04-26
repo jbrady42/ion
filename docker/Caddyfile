@@ -2,7 +2,7 @@
   tls {$ADMIN_EMAIL}
 }
 
-{$WWW_URL}:80 {$WWW_URL}:8080 {
+{$WWW_URL}:80 {$WWW_URL}:443 {$WWW_URL}:8080 {
   root /app/demo/dist
 
   proxy /ws biz:8443 {
