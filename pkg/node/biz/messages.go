@@ -19,6 +19,10 @@ type MediaInfo struct {
 	Mid string `json:"mid"`
 }
 
+type RTCInfo struct {
+	Jsep webrtc.SessionDescription `json:"jsep"`
+}
+
 type PublishOptions struct {
 	Codec      string `json:"codec"`
 	Resolution string `json:"resolution"`
@@ -49,8 +53,12 @@ type CloseMsg struct {
 
 type PublishMsg struct {
 	RoomInfo
-	Jsep    webrtc.SessionDescription `json:"jsep"`
-	Options PublishOptions            `json:"options"`
+	RTCInfo
+	Options PublishOptions `json:"options"`
+}
+
+type PublishResponseMsg struct {
+	RTCInfo
 }
 
 type UnpublishMsg struct {
@@ -61,7 +69,7 @@ type UnpublishMsg struct {
 
 type SubscribeMsg struct {
 	MediaInfo
-	Jsep webrtc.SessionDescription `json:"jsep"`
+	RTCInfo
 }
 
 type UnsubscribeMsg struct {
