@@ -26,9 +26,9 @@ type Peer struct {
 	peer.Peer
 }
 
-func (p *Peer) On(event, listener interface{}) {
-	p.Peer.On(event, listener)
-}
+// func (p *Peer) On(event, listener interface{}) {
+// 	p.Peer.On(event, listener)
+// }
 
 func (c *Peer) Request(method string, data map[string]interface{}) {
 	c.Peer.Request(method, data, accept, reject)
