@@ -35,4 +35,4 @@ require (
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
-replace github.com/cloudwebrtc/go-protoo => github.com/jbrady42/go-protoo v0.0.4
+replace github.com/cloudwebrtc/go-protoo => github.com/jbrady42/go-protoo v0.0.5
