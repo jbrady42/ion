@@ -80,6 +80,12 @@ type UnpublishMsg struct {
 }
 
 type SubscribeMsg struct {
+	RoomInfo
+	MediaInfo
+	RTCInfo
+}
+
+type SubscribeResponseMsg struct {
 	MediaInfo
 	RTCInfo
 }
