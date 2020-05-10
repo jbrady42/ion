@@ -34,3 +34,5 @@ require (
 	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
+
+replace github.com/cloudwebrtc/go-protoo => github.com/jbrady42/go-protoo v0.0.6
