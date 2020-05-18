@@ -155,9 +155,9 @@ func (r *Router) subWriteLoop(subID string, trans transport.Transport) {
 
 func (r *Router) subFeedbackLoop(subID string, trans transport.Transport) {
 	for pkt := range trans.GetRTCPChan() {
-		// if r.stop {
-		// 	return
-		// }
+		if r.stop {
+			break
+		}
 		switch pkt := pkt.(type) {
 		case *rtcp.PictureLossIndication:
 			if r.GetPub() != nil {
