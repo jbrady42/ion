@@ -10,6 +10,7 @@ import (
 	"github.com/pion/ion/pkg/util"
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp"
+	"github.com/pion/webrtc/v2"
 )
 
 const (
@@ -131,6 +132,15 @@ func (r *Router) subWriteLoop(subID string, trans transport.Transport) {
 	for pkt := range r.subChans[subID] {
 		// log.Infof(" WriteRTP %v:%v to %v ", pkt.SSRC, pkt.SequenceNumber, t.ID())
 
+		// Transform into browser specific payloadType
+		// For all tracks
+		// If sub transport PT != pck.PT and sub is allowed from src PT
+		// JUST FREAKING UPDATE THE PT ID
+
+		if pkt.Header.PayloadType == webrtc.DefaultPayloadTypeVP9 {
+			pkt.Header.PayloadType = 121
+		}
+
 		if err := trans.WriteRTP(pkt); err != nil {
 			// log.Errorf("wt.WriteRTP err=%v", err)
 			// del sub when err is increasing
@@ -144,11 +154,10 @@ func (r *Router) subWriteLoop(subID string, trans transport.Transport) {
 }
 
 func (r *Router) subFeedbackLoop(subID string, trans transport.Transport) {
-	for {
-		pkt := <-trans.GetRTCPChan()
-		if r.stop {
-			return
-		}
+	for pkt := range trans.GetRTCPChan() {
+		// if r.stop {
+		// 	return
+		// }
 		switch pkt := pkt.(type) {
 		case *rtcp.PictureLossIndication:
 			if r.GetPub() != nil {
@@ -182,6 +191,7 @@ func (r *Router) subFeedbackLoop(subID string, trans transport.Transport) {
 		default:
 		}
 	}
+	log.Infof("Closing sub feedback")
 }
 
 // AddSub add a pub to router
