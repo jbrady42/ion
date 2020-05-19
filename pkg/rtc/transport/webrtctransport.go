@@ -64,6 +64,7 @@ type WebRTCTransport struct {
 	alive             bool
 	bandwidth         int
 	isPub             bool
+	ptMap             map[uint32]uint8
 }
 
 func (w *WebRTCTransport) init(options map[string]interface{}) error {
@@ -152,6 +153,7 @@ func NewWebRTCTransport(id string, options map[string]interface{}) *WebRTCTransp
 		rtcpCh:      make(chan rtcp.Packet, maxChanSize),
 		candidateCh: make(chan *webrtc.ICECandidate, maxChanSize),
 		alive:       true,
+		ptMap:       make(map[uint32]uint8),
 	}
 	err := w.init(options)
 	if err != nil {
@@ -204,6 +206,11 @@ func NewWebRTCTransport(id string, options map[string]interface{}) *WebRTCTransp
 	return w
 }
 
+// TransformPayload return true
+func (w *WebRTCTransport) GetPayloadMap() map[uint32]uint8 {
+	return w.ptMap
+}
+
 // ID return id
 func (w *WebRTCTransport) ID() string {
 	return w.id
@@ -248,10 +255,17 @@ func (w *WebRTCTransport) AddSendTrack(ssrc uint32, pt uint8, streamID string, t
 		return nil, err
 	}
 
-	_, err = w.pc.AddTransceiverFromTrack(track, webrtc.RtpTransceiverInit{Direction: webrtc.RTPTransceiverDirectionSendonly})
+	_, err = w.pc.AddTransceiverFromTrack(track, webrtc.RtpTransceiverInit{
+		Direction: webrtc.RTPTransceiverDirectionSendonly,
+		SendEncodings: []webrtc.RTPEncodingParameters{webrtc.RTPEncodingParameters{
+			RTPCodingParameters: webrtc.RTPCodingParameters{SSRC: ssrc, PayloadType: pt}},
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
+
+	w.ptMap[ssrc] = pt
 
 	w.outTrackLock.Lock()
 	w.outTracks[ssrc] = track
@@ -285,6 +299,7 @@ func (w *WebRTCTransport) Answer(offer webrtc.SessionDescription, options map[st
 			w.receiveInTrackRTP(remoteTrack)
 		})
 	} else {
+		// Subscribe
 		ssrcPT := options["ssrcpt"]
 		if ssrcPT == nil {
 			return webrtc.SessionDescription{}, errInvalidOptions
@@ -307,8 +322,12 @@ func (w *WebRTCTransport) Answer(offer webrtc.SessionDescription, options map[st
 						log.Errorf("w.pc.AddTrack err=%v", err)
 					}
 				}
+			} else {
+				// This should always be the case on sub sender
+				// w.ptMap[ssrc] = pt
 			}
 		}
+		log.Infof("SUB PTMAP %v", w.ptMap)
 		w.receiveOutTrackRTCP()
 	}
 
