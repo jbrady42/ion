@@ -32,7 +32,7 @@ kcpsalt = ""
 
 # Range of ports that ion accepts WebRTC traffic on
 # Format: [min, max]   and max - min >= 100
-# portrange = [50000, 60000]
+portrange = [50000, 50005]
 # if sfu behind nat, set iceserver
 # [[webrtc.iceserver]]
 # urls = ["stun:stun.stunprotocol.org:3478"]
